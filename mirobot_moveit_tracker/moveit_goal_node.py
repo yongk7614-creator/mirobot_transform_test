@@ -27,8 +27,8 @@ class MoveItGoalNode(Node):
         self.declare_parameter("cartesian_fraction_threshold", 0.0)
         self.declare_parameter("execute", True)
         self.declare_parameter("ignore_same_goal", True)
-        self.declare_parameter("dry_run_only", False)
-        self.declare_parameter("accept_any_frame", False)
+        self.declare_parameter("dry_run_only", True)
+        self.declare_parameter("accept_any_frame", True)
 
         self.goal_pose_topic = str(self.get_parameter("goal_pose_topic").value)
         self.group_name = str(self.get_parameter("group_name").value)
