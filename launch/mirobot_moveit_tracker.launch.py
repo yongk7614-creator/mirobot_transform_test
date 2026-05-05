@@ -10,6 +10,7 @@ def generate_launch_description():
         DeclareLaunchArgument("pose_topic", default_value="/aruco_poses"),
         DeclareLaunchArgument("wheel_status_topic", default_value="/wheel_status"),
         DeclareLaunchArgument("goal_topic", default_value="/mirobot_goal_pose"),
+        DeclareLaunchArgument("use_tf_transform", default_value="true"),
         DeclareLaunchArgument("sample_delay_sec", default_value="0.2"),
         DeclareLaunchArgument("sample_count", default_value="5"),
         DeclareLaunchArgument("offset_x", default_value="0.0"),
@@ -31,12 +32,17 @@ def generate_launch_description():
         DeclareLaunchArgument("cartesian_fraction_threshold", default_value="0.0"),
         DeclareLaunchArgument("execute", default_value="true"),
         DeclareLaunchArgument("ignore_same_goal", default_value="true"),
+        DeclareLaunchArgument("dry_run_only", default_value="false"),
+        DeclareLaunchArgument("accept_any_frame", default_value="false"),
     ]
 
     wheel_stop_parameters = {
         "pose_topic": LaunchConfiguration("pose_topic"),
         "wheel_status_topic": LaunchConfiguration("wheel_status_topic"),
         "goal_topic": LaunchConfiguration("goal_topic"),
+        "use_tf_transform": ParameterValue(
+            LaunchConfiguration("use_tf_transform"), value_type=bool
+        ),
         "sample_delay_sec": ParameterValue(
             LaunchConfiguration("sample_delay_sec"), value_type=float
         ),
@@ -75,6 +81,12 @@ def generate_launch_description():
         "execute": ParameterValue(LaunchConfiguration("execute"), value_type=bool),
         "ignore_same_goal": ParameterValue(
             LaunchConfiguration("ignore_same_goal"), value_type=bool
+        ),
+        "dry_run_only": ParameterValue(
+            LaunchConfiguration("dry_run_only"), value_type=bool
+        ),
+        "accept_any_frame": ParameterValue(
+            LaunchConfiguration("accept_any_frame"), value_type=bool
         ),
     }
 
