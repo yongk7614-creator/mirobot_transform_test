@@ -264,5 +264,6 @@ else:
     goal_pose.header.frame_id = self.sample_buffer[-1].header.frame_id
 
 해당 부분을 다음과 같이 수정
+
 goal_pose.header.stamp = self.get_clock().now().to_msg()
 goal_pose.header.frame_id = self.goal_frame
