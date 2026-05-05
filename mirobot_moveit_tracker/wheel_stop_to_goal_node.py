@@ -15,7 +15,7 @@ class WheelStopToGoalNode(Node):
         super().__init__("wheel_stop_to_goal_node")
 
         defaults = {
-            "pose_topic":             "/aruco_poses",
+            "pose_topic":             "/aruco_tf",
             "wheel_status_topic":     "/wheel_status",
             "goal_topic":             "/mirobot_goal_pose",
             "use_tf_transform":       False,
