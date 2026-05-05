@@ -18,7 +18,7 @@ class WheelStopToGoalNode(Node):
             "pose_topic":             "/aruco_poses",
             "wheel_status_topic":     "/wheel_status",
             "goal_topic":             "/mirobot_goal_pose",
-            "use_tf_transform":       True,
+            "use_tf_transform":       False,
             "sample_delay_sec":       0.2,
             "sample_count":           5,
             "offset_x":               0.0,
