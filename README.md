@@ -250,3 +250,15 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
 [moveit_goal_node] Received MoveIt goal request: frame=base_link x=0.XXXX y=0.XXXX z=0.XXXX
 [moveit_goal_node] Goal validated. Ready to send to MoveIt: pos=[...] quat=[...]
 [moveit_goal_node] Dry-run only: tracker is ready. Goal would be sent to MoveIt here.
+
+
+# 실제 Moveit에 넘겨줄때
+goal_pose.header.stamp = self.get_clock().now().to_msg()
+if self.use_tf_transform:
+    goal_pose.header.frame_id = self.goal_frame
+else:
+    goal_pose.header.frame_id = self.sample_buffer[-1].header.frame_id
+
+해당 부분을 다음과 같이 수정
+goal_pose.header.stamp = self.get_clock().now().to_msg()
+goal_pose.header.frame_id = self.goal_frame
