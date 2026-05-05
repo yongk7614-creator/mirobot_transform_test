@@ -232,13 +232,15 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
 ```
 
 ---
-
+## Test 할 때
+```bash
 ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
     pose_topic:=/aruco_tf \
     use_tf_transform:=false \
     goal_frame:=base_link \
     dry_run_only:=true \
     accept_any_frame:=true
+```
 ---
     # stopped 수신 후
 [wheel_stop_to_goal_node] Wheel stopped. Waiting 0.200 sec before collecting 5 samples.
