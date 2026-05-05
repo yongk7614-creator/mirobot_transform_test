@@ -231,6 +231,7 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
     accept_any_frame:=false
 ```
 
+---
 
 ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
     pose_topic:=/aruco_tf \
@@ -238,21 +239,20 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
     goal_frame:=base_link \
     dry_run_only:=true \
     accept_any_frame:=true
-
+---
     # stopped 수신 후
 [wheel_stop_to_goal_node] Wheel stopped. Waiting 0.200 sec before collecting 5 samples.
 [wheel_stop_to_goal_node] Started ArUco pose sampling.
 
-# 5개 샘플 평균 후 발행 (frame_id가 base_link로 바뀜)
+## 5개 샘플 평균 후 발행 (frame_id가 base_link로 바뀜)
 [wheel_stop_to_goal_node] Averaged pose published (in base_link): x=0.XXXX y=0.XXXX z=0.XXXX
-
----
 
 ## moveit_goal_node 수신 및 준비 확인
 [moveit_goal_node] Received MoveIt goal request: frame=base_link x=0.XXXX y=0.XXXX z=0.XXXX
 [moveit_goal_node] Goal validated. Ready to send to MoveIt: pos=[...] quat=[...]
 [moveit_goal_node] Dry-run only: tracker is ready. Goal would be sent to MoveIt here.
 
+---
 
 ## 실제 Moveit에 넘겨줄때
 goal_pose.header.stamp = self.get_clock().now().to_msg()
