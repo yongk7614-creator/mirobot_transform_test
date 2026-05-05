@@ -230,3 +230,11 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
     dry_run_only:=false \
     accept_any_frame:=false
 ```
+
+
+ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
+    pose_topic:=/aruco_tf \
+    use_tf_transform:=false \
+    goal_frame:=base_link \
+    dry_run_only:=true \
+    accept_any_frame:=true
