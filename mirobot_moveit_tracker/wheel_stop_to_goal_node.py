@@ -18,6 +18,7 @@ class WheelStopToGoalNode(Node):
             "pose_topic":             "/aruco_poses",
             "wheel_status_topic":     "/wheel_status",
             "goal_topic":             "/mirobot_goal_pose",
+            "use_tf_transform":       True,
             "sample_delay_sec":       0.2,
             "sample_count":           5,
             "offset_x":               0.0,
@@ -85,7 +86,10 @@ class WheelStopToGoalNode(Node):
         raw.header = copy.deepcopy(msg.header)
         raw.pose = copy.deepcopy(msg.poses[0])
 
-        transformed = self._transform_to_goal_frame(copy.deepcopy(raw))
+        if self.use_tf_transform:
+            transformed = self._transform_to_goal_frame(copy.deepcopy(raw))
+        else:
+            transformed = copy.deepcopy(raw)
 
         if transformed is None:
             self.get_logger().warn(
@@ -94,87 +98,3 @@ class WheelStopToGoalNode(Node):
             return
 
         self.latest_pose = copy.deepcopy(transformed)
-
-        if not self.collecting:
-            return
-
-        self.sample_buffer.append(copy.deepcopy(transformed))
-
-        if len(self.sample_buffer) >= self.sample_count:
-            self.publish_averaged_goal()
-            self.reset_sampling()
-
-    def status_callback(self, msg):
-        is_stopped = msg.data.strip().lower() == "stopped"
-
-        if not is_stopped:
-            self.prev_is_stopped = False
-            self.reset_sampling()
-            return
-
-        if self.prev_is_stopped:
-            return
-
-        if self.latest_pose is None:
-            self.get_logger().warn("No ArUco pose received yet.")
-            return
-
-        self.prev_is_stopped = True
-        self.reset_sampling()
-        self.delay_timer = self.create_timer(self.sample_delay_sec, self.start_sampling_once)
-
-        self.get_logger().info(
-            "Wheel stopped. Waiting %.3f sec before collecting %d samples."
-            % (self.sample_delay_sec, self.sample_count)
-        )
-
-    def start_sampling_once(self):
-        self.reset_sampling()
-        self.collecting = True
-        self.get_logger().info("Started ArUco pose sampling.")
-
-    def publish_averaged_goal(self):
-        if not self.sample_buffer:
-            self.get_logger().warn("No samples collected.")
-            return
-
-        n = len(self.sample_buffer)
-        avg_x = sum(p.pose.position.x for p in self.sample_buffer) / n
-        avg_y = sum(p.pose.position.y for p in self.sample_buffer) / n
-        avg_z = sum(p.pose.position.z for p in self.sample_buffer) / n
-
-        goal_pose = copy.deepcopy(self.sample_buffer[-1])
-        goal_pose.header.stamp = self.get_clock().now().to_msg()
-        goal_pose.header.frame_id = self.goal_frame
-        goal_pose.pose.position.x = avg_x + self.offset_x
-        goal_pose.pose.position.y = avg_y + self.offset_y
-        goal_pose.pose.position.z = avg_z + self.offset_z
-
-        if not self.use_marker_orientation:
-            goal_pose.pose.orientation.x = self.goal_qx
-            goal_pose.pose.orientation.y = self.goal_qy
-            goal_pose.pose.orientation.z = self.goal_qz
-            goal_pose.pose.orientation.w = self.goal_qw
-
-        self.goal_pub.publish(goal_pose)  
-        self.get_logger().info(
-            "Averaged pose published (in %s): x=%.4f y=%.4f z=%.4f"
-            % (
-                self.goal_frame,
-                goal_pose.pose.position.x,
-                goal_pose.pose.position.y,
-                goal_pose.pose.position.z,
-            )
-        )
-
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = WheelStopToGoalNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:  
-        pass
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
