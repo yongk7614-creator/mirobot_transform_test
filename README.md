@@ -246,13 +246,15 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
 # 5개 샘플 평균 후 발행 (frame_id가 base_link로 바뀜)
 [wheel_stop_to_goal_node] Averaged pose published (in base_link): x=0.XXXX y=0.XXXX z=0.XXXX
 
-# moveit_goal_node 수신 및 준비 확인
+---
+
+## moveit_goal_node 수신 및 준비 확인
 [moveit_goal_node] Received MoveIt goal request: frame=base_link x=0.XXXX y=0.XXXX z=0.XXXX
 [moveit_goal_node] Goal validated. Ready to send to MoveIt: pos=[...] quat=[...]
 [moveit_goal_node] Dry-run only: tracker is ready. Goal would be sent to MoveIt here.
 
 
-# 실제 Moveit에 넘겨줄때
+## 실제 Moveit에 넘겨줄때
 goal_pose.header.stamp = self.get_clock().now().to_msg()
 if self.use_tf_transform:
     goal_pose.header.frame_id = self.goal_frame
