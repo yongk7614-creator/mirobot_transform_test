@@ -6,6 +6,15 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
+    joint_names = [
+        "joint1",
+        "joint2",
+        "joint3",
+        "joint4",
+        "joint5",
+        "joint6",
+    ]
+
     launch_args = [
         DeclareLaunchArgument("pose_topic", default_value="/aruco_poses"),
         DeclareLaunchArgument("wheel_status_topic", default_value="/wheel_status"),
@@ -26,7 +35,6 @@ def generate_launch_description():
         DeclareLaunchArgument("group_name", default_value="mirobot_group"),
         DeclareLaunchArgument("base_link_name", default_value="base_link"),
         DeclareLaunchArgument("end_effector_name", default_value="link6"),
-        DeclareLaunchArgument("joint_names", default_value="[joint1, joint2, joint3, joint4, joint5, joint6]"),
         DeclareLaunchArgument("cartesian", default_value="false"),
         DeclareLaunchArgument("cartesian_max_step", default_value="0.0025"),
         DeclareLaunchArgument("cartesian_fraction_threshold", default_value="0.0"),
@@ -60,7 +68,9 @@ def generate_launch_description():
         "goal_qy": ParameterValue(LaunchConfiguration("goal_qy"), value_type=float),
         "goal_qz": ParameterValue(LaunchConfiguration("goal_qz"), value_type=float),
         "goal_qw": ParameterValue(LaunchConfiguration("goal_qw"), value_type=float),
-        "tf_timeout_sec": ParameterValue(LaunchConfiguration("tf_timeout_sec"), value_type=float),
+        "tf_timeout_sec": ParameterValue(
+            LaunchConfiguration("tf_timeout_sec"), value_type=float
+        ),
     }
 
     moveit_goal_parameters = {
@@ -68,7 +78,7 @@ def generate_launch_description():
         "group_name": LaunchConfiguration("group_name"),
         "base_link_name": LaunchConfiguration("base_link_name"),
         "end_effector_name": LaunchConfiguration("end_effector_name"),
-        "joint_names": LaunchConfiguration("joint_names"),
+        "joint_names": joint_names,
         "cartesian": ParameterValue(
             LaunchConfiguration("cartesian"), value_type=bool
         ),
