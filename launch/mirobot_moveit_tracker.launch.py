@@ -19,7 +19,7 @@ def generate_launch_description():
         DeclareLaunchArgument("pose_topic", default_value="/aruco_poses"),
         DeclareLaunchArgument("wheel_status_topic", default_value="/wheel_status"),
         DeclareLaunchArgument("goal_topic", default_value="/mirobot_goal_pose"),
-        DeclareLaunchArgument("use_tf_transform", default_value="true"),
+        DeclareLaunchArgument("use_tf_transform", default_value="false"),
         DeclareLaunchArgument("sample_delay_sec", default_value="0.2"),
         DeclareLaunchArgument("sample_count", default_value="5"),
         DeclareLaunchArgument("offset_x", default_value="0.0"),
