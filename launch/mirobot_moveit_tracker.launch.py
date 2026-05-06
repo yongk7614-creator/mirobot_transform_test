@@ -40,8 +40,8 @@ def generate_launch_description():
         DeclareLaunchArgument("cartesian_fraction_threshold", default_value="0.0"),
         DeclareLaunchArgument("execute", default_value="true"),
         DeclareLaunchArgument("ignore_same_goal", default_value="true"),
-        DeclareLaunchArgument("dry_run_only", default_value="true"),
-        DeclareLaunchArgument("accept_any_frame", default_value="true"),
+        DeclareLaunchArgument("dry_run_only", default_value="false"),
+        DeclareLaunchArgument("accept_any_frame", default_value="false"),
     ]
 
     wheel_stop_parameters = {
