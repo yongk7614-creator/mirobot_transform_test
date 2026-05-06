@@ -149,10 +149,9 @@ class WheelStopToGoalNode(Node):
 
         goal_pose = copy.deepcopy(self.sample_buffer[-1])
         goal_pose.header.stamp = self.get_clock().now().to_msg()
-        if self.use_tf_transform:
-            goal_pose.header.frame_id = self.goal_frame
-        else:
-            goal_pose.header.frame_id = self.sample_buffer[-1].header.frame_id
+        
+        goal_pose.header.frame_id = self.goal_frame
+        
         goal_pose.pose.position.x = avg_x + self.offset_x
         goal_pose.pose.position.y = avg_y + self.offset_y
         goal_pose.pose.position.z = avg_z + self.offset_z
