@@ -20,8 +20,6 @@ def generate_launch_description():
         DeclareLaunchArgument("wheel_status_topic", default_value="/wheel_status"),
         DeclareLaunchArgument("goal_topic", default_value="/mirobot_goal_pose"),
         DeclareLaunchArgument("use_tf_transform", default_value="false"),
-        DeclareLaunchArgument("sample_delay_sec", default_value="0.2"),
-        DeclareLaunchArgument("sample_count", default_value="5"),
         DeclareLaunchArgument("offset_x", default_value="0.0"),
         DeclareLaunchArgument("offset_y", default_value="0.0"),
         DeclareLaunchArgument("offset_z", default_value="0.0"),
@@ -50,12 +48,6 @@ def generate_launch_description():
         "goal_topic": LaunchConfiguration("goal_topic"),
         "use_tf_transform": ParameterValue(
             LaunchConfiguration("use_tf_transform"), value_type=bool
-        ),
-        "sample_delay_sec": ParameterValue(
-            LaunchConfiguration("sample_delay_sec"), value_type=float
-        ),
-        "sample_count": ParameterValue(
-            LaunchConfiguration("sample_count"), value_type=int
         ),
         "offset_x": ParameterValue(LaunchConfiguration("offset_x"), value_type=float),
         "offset_y": ParameterValue(LaunchConfiguration("offset_y"), value_type=float),
