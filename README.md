@@ -10,7 +10,7 @@ ArUco 마커 인식 → 매카넘 휠 정지 → MoveIt trajectory 생성 → G-
 [D405 카메라]
       │ /camera/image_raw
       ▼
-[ros2_aruco]  ──── ArUco 마커 인식 ────►  /aruco_tf  (base_link 기준 좌표, PoseArray)
+[ros2_aruco]  ──── ArUco 마커 인식 ────►  /aruco_tf  (카메라 프레임 기준 좌표, PoseArray)
       │
       │ /aruco_poses
       ▼
@@ -18,7 +18,8 @@ ArUco 마커 인식 → 매카넘 휠 정지 → MoveIt trajectory 생성 → G-
       │ /wheel_status ("stopped")
       ▼
 [wheel_stop_to_goal_node] ◄──── /aruco_tf
-      │ 5개 샘플 수집 → 평균 계산
+      │ stopped 수신 즉시 최신 좌표 1개 사용
+      │ 축 재매핑 (카메라 → MoveIt 좌표계)
       │ /mirobot_goal_pose (PoseStamped, base_link 기준)
       ▼
 [moveit_goal_node]
@@ -41,11 +42,39 @@ ArUco 마커 인식 → 매카넘 휠 정지 → MoveIt trajectory 생성 → G-
 
 | 조건 | 확인 방법 |
 |------|-----------|
-| `/aruco_tf` 좌표가 base_link 기준 | `ros2 topic echo /aruco_tf` |
-| quaternion이 모두 0이 아님 | `ros2 topic echo /aruco_tf` — orientation 값 확인 |
+| `/aruco_tf` quaternion이 모두 0이 아님 | `ros2 topic echo /aruco_tf` — orientation 값 확인 |
 | `pymoveit2` 설치 | `python3 -c "from pymoveit2 import MoveIt2; print('OK')"` |
 | `move_group` 실행 중 | `ros2 node list \| grep move_group` |
 | goal pose가 Mirobot 작업공간 안 | MoveIt IK 계산 성공 여부로 확인 |
+
+---
+
+## 축 변환 (remap_axes)
+
+카메라 프레임과 MoveIt base_link 의 축 방향이 다르기 때문에 좌표 변환이 필요합니다.
+
+```
+카메라 프레임          MoveIt base_link
+  x: 위          →      z (-cam_x, 부호 반전)
+  y: 아래        →      x ( cam_y)
+  z: 마커까지    →      y ( cam_z)
+```
+
+`remap_axes=true`(기본값)이면 다음 변환이 자동으로 적용됩니다.
+
+```
+moveit_x =  cam_y
+moveit_y =  cam_z
+moveit_z = -cam_x
+```
+
+변환 후 좌표가 로그로 출력됩니다.
+
+```
+[remap_axes] cam(x=0.XXXX y=0.XXXX z=0.XXXX) → moveit(x=0.XXXX y=0.XXXX z=0.XXXX)
+```
+
+offset_x/y/z 는 축 재매핑 이후에 MoveIt base_link 기준으로 적용됩니다.
 
 ---
 
@@ -91,8 +120,6 @@ source install/setup.bash
 source ~/ros2_ws/install/setup.bash
 ros2 launch realsense2_camera rs_launch.py
 ```
-
-카메라가 정상 기동되면 `/camera/image_raw` 토픽이 발행됩니다.
 
 ---
 
@@ -185,6 +212,9 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py
 ### 터미널 5 — mirobot_tracker 기동 후
 
 ```
+[wheel_stop_to_goal_node] WheelStopToGoalNode ready.
+  pose_topic=/aruco_tf  use_tf_transform=False  goal_frame=base_link  remap_axes=True
+
 [moveit_goal_node] MoveItGoalNode parameter
   group        : mirobot_group
   base_link    : base_link
@@ -208,9 +238,11 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py
 ### 터미널 5 — stopped 수신 이후 순서대로 출력
 
 ```
-[wheel_stop_to_goal_node] Wheel stopped. Waiting 0.200 sec before collecting 5 samples.
-[wheel_stop_to_goal_node] Started ArUco pose sampling.
-[wheel_stop_to_goal_node] Averaged pose published (in base_link): x=0.XXXX y=0.XXXX z=0.XXXX
+[wheel_stop_to_goal_node] Wheel stopped. Publishing latest ArUco pose immediately.
+
+[wheel_stop_to_goal_node] [remap_axes] cam(x=0.XXXX y=0.XXXX z=0.XXXX) → moveit(x=0.XXXX y=0.XXXX z=0.XXXX)
+
+[wheel_stop_to_goal_node] Goal published (in base_link): x=0.XXXX y=0.XXXX z=0.XXXX  qx=... qy=... qz=... qw=...
 
 [moveit_goal_node] Received MoveIt goal request: frame=base_link x=0.XXXX y=0.XXXX z=0.XXXX
 [moveit_goal_node] Goal validated. Ready to send to MoveIt: pos=[...] quat=[...]
@@ -236,7 +268,7 @@ ___________________________________
 
 ## 문제 해결
 
-### `No ArUco pose received yet.` 반복
+### `No ArUco pose received yet.`
 
 ```
 [wheel_stop_to_goal_node] No ArUco pose received yet.
@@ -263,14 +295,15 @@ ros2 topic echo /aruco_tf
 ### MoveIt IK 실패 (goal이 작업공간 밖)
 
 ```
-[moveit_goal_node] Failed to send goal to MoveIt: ...
+[ompl] Unable to sample any valid states for goal tree
 ```
 
-goal pose의 좌표가 Mirobot의 작업공간 밖에 있는 경우입니다. `/aruco_tf` 좌표값이 실제로 base_link 기준인지 조원과 확인하고, 필요 시 `offset_z` 파라미터로 조정합니다.
+remap_axes 후 좌표가 Mirobot 작업공간 밖에 있는 경우입니다. offset으로 조정합니다.
 
 ```bash
+# MoveIt base_link 기준 z축으로 5cm 위 조정
 ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
-    offset_z:=-0.05
+    offset_z:=0.05
 ```
 
 ---
@@ -281,11 +314,8 @@ ros2 launch mirobot_moveit_tracker mirobot_moveit_tracker.launch.py \
 [mirobot_gcode_driver] Failed to open serial port /dev/ttyUSB0: ...
 ```
 
-Mirobot USB 연결 상태와 포트 이름을 확인합니다.
-
 ```bash
 ls /dev/ttyUSB*
-# 포트가 다르면 serial_port 파라미터 변경
 ros2 launch wlkata_mirobot_moveit_config real_hardware.launch.py \
     serial_port:=/dev/ttyUSB1 \
     use_rviz:=false \
@@ -302,10 +332,11 @@ ros2 launch wlkata_mirobot_moveit_config real_hardware.launch.py \
 |----------|--------|------|
 | `pose_topic` | `/aruco_tf` | ArUco 좌표 토픽 |
 | `use_tf_transform` | `false` | TF 변환 사용 여부 |
+| `remap_axes` | `true` | 카메라↔MoveIt 축 재매핑 (cam_y→x, cam_z→y, cam_x→-z) |
 | `goal_frame` | `base_link` | 목표 좌표계 |
-| `sample_count` | `5` | 평균 계산 샘플 수 |
-| `offset_x/y/z` | `0.0` | base_link 기준 오프셋(m) |
+| `offset_x/y/z` | `0.0` | MoveIt base_link 기준 오프셋(m), 축 재매핑 이후 적용 |
 | `dry_run_only` | `false` | true: MoveIt 미호출, 로그만 출력 |
+| `accept_any_frame` | `false` | true: frame_id 검증 우회 |
 
 ### real_hardware.launch.py
 
