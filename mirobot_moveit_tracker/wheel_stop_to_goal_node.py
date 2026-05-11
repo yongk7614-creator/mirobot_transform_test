@@ -162,9 +162,9 @@ class WheelStopToGoalNode(Node):
             cam_y = goal_pose.pose.position.y
             cam_z = goal_pose.pose.position.z
 
-            goal_pose.pose.position.x =  cam_y   # 카메라 y → MoveIt x
-            goal_pose.pose.position.y =  cam_z   # 카메라 z → MoveIt y
-            goal_pose.pose.position.z = -cam_x   # 카메라 x → MoveIt z (부호 반전)
+            goal_pose.pose.position.x =  cam_x   # 카메라 x → MoveIt x
+            goal_pose.pose.position.y =  cam_z   # 카메라 y → MoveIt z
+            goal_pose.pose.position.z = cam_y   # 카메라 z → MoveIt y 
 
             self.get_logger().info(
                 "[remap_axes] "
