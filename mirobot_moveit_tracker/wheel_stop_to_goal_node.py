@@ -136,22 +136,6 @@ class WheelStopToGoalNode(Node):
 
 
     def publish_goal(self):
-        """
-        축 재매핑(remap_axes) 후 offset 을 MoveIt 기준으로 적용하여 발행.
-
-        처리 순서:
-          1. 축 재매핑 (remap_axes=True 일 때)
-               카메라 y  →  MoveIt x
-               카메라 z  →  MoveIt y
-               카메라 x  →  MoveIt z (부호 반전)
-          2. offset 적용 (MoveIt base_link 기준)
-               x += offset_x
-               y += offset_y
-               z += offset_z
-
-        offset 을 재매핑 이후에 더하므로
-        offset_x/y/z 가 항상 MoveIt(base_link) 축 기준으로 동작한다.
-        """
         goal_pose = copy.deepcopy(self.latest_pose)
         goal_pose.header.stamp = self.get_clock().now().to_msg()
         goal_pose.header.frame_id = self.goal_frame
