@@ -42,7 +42,7 @@ def generate_launch_description():
             default_value="true",
             description=(
                 "true: apply axis remap before sending to MoveIt. "
-                "cam_y->x, cam_z->y, cam_x->-z"
+                "moveit_x -> cam_x, moveit_y -> cam_z, moveit_z -> -cam_y"
             ),
         ),
 
