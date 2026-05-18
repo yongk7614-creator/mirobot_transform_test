@@ -140,7 +140,6 @@ class WheelStopToGoalNode(Node):
         goal_pose.header.stamp = self.get_clock().now().to_msg()
         goal_pose.header.frame_id = self.goal_frame
 
-        ########################################################
         # [1단계] 축 재매핑
         if self.remap_axes:
             cam_x = goal_pose.pose.position.x
@@ -154,7 +153,7 @@ class WheelStopToGoalNode(Node):
             goal_pose.pose.position.x =  moveit_x   
             goal_pose.pose.position.y =  moveit_y   
             goal_pose.pose.position.z = moveit_z  
-        ##########################################################
+
             self.get_logger().info(
                 "[remap_axes] "
                 "cam(x=%.4f y=%.4f z=%.4f) → moveit(x=%.4f y=%.4f z=%.4f)"
