@@ -147,8 +147,8 @@ class WheelStopToGoalNode(Node):
             cam_y = goal_pose.pose.position.y
             cam_z = goal_pose.pose.position.z
 
-            moveit_x = cam_z
-            moveit_y = -cam_x
+            moveit_x = cam_x
+            moveit_y = cam_z
             moveit_z = -cam_y
             
             goal_pose.pose.position.x =  moveit_x   
