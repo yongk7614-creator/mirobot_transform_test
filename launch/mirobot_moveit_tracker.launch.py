@@ -32,11 +32,6 @@ def generate_launch_description():
         DeclareLaunchArgument("goal_qw",                default_value="1.0"),
         DeclareLaunchArgument("tf_timeout_sec",         default_value="0.5"),
         # ── 축 재매핑 파라미터 ────────────────────────────────────────
-        # remap_axes=true 이면 아래 변환을 적용한다.
-        #   카메라 y  →  MoveIt x  ( aruco_y →  moveit_x)
-        #   카메라 z  →  MoveIt y  ( aruco_z →  moveit_y)
-        #   카메라 x  →  MoveIt z  (-aruco_x →  moveit_z, 부호 반전)
-        # launch 에서 remap_axes:=true / remap_axes:=false 로 실험 가능
         DeclareLaunchArgument(
             "remap_axes",
             default_value="true",
@@ -45,7 +40,6 @@ def generate_launch_description():
                 "moveit_x -> cam_x, moveit_y -> cam_z, moveit_z -> -cam_y"
             ),
         ),
-
         # ── moveit_goal_node ──────────────────────────────────────────
         DeclareLaunchArgument("group_name",                   default_value="mirobot_group"),
         DeclareLaunchArgument("base_link_name",               default_value="base_link"),
